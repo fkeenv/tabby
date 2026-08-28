@@ -8,4 +8,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::inertia('dashboard', 'Dashboard')->name('dashboard');
 });
 
+/** PROTOTYPE — throwaway, issue #5. Lives only on the prototype/balances branch. */
+Route::inertia('prototype/balances', 'prototype/BalanceScreen')->name('prototype.balances');
+
 require __DIR__.'/settings.php';
