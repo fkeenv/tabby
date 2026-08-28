@@ -6,7 +6,7 @@
  * Built for the phone being passed around the table, not one phone per person.
  * Completeness warning: a fill bar on the tile itself.
  */
-import { UserPlus, X } from '@lucide/vue';
+import { Minus, UserPlus, X } from '@lucide/vue';
 import { computed, ref } from 'vue';
 import {
     actingAs,
@@ -24,10 +24,9 @@ import {
     similarNames,
     totalCentsFor,
     totalShares,
-    unclaimedItems
-    
+    unclaimedItems,
 } from './state';
-import type {LineItem} from './state';
+import type { LineItem } from './state';
 
 const adding = ref(false);
 const typedName = ref('');
@@ -203,10 +202,21 @@ function tap(item: LineItem): void {
             >
                 <span
                     v-if="mine(item) > 0"
-                    class="absolute -top-1.5 -right-1.5 grid size-6 place-items-center rounded-full bg-neutral-900 text-xs font-bold text-white"
-                    @click.stop="bumpShares(item.id, session.actingAsId!, -1)"
+                    class="absolute -top-2.5 -right-2 flex items-center gap-0.5 rounded-full bg-neutral-900 py-0.5 pr-2 pl-0.5 text-white shadow-sm"
                 >
-                    {{ mine(item) }}
+                    <span
+                        class="grid size-6 place-items-center rounded-full bg-white/15 active:bg-white/35"
+                        role="button"
+                        :aria-label="'Give back a share of ' + item.description"
+                        @click.stop="
+                            bumpShares(item.id, session.actingAsId!, -1)
+                        "
+                    >
+                        <Minus class="size-3.5" />
+                    </span>
+                    <span class="text-xs font-bold tabular-nums">{{
+                        mine(item)
+                    }}</span>
                 </span>
 
                 <span

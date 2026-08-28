@@ -23,10 +23,9 @@ import {
     similarNames,
     subtotalCentsFor,
     totalCentsFor,
-    totalShares
-    
+    totalShares,
 } from './state';
-import type {LineItem} from './state';
+import type { LineItem } from './state';
 
 const typedName = ref('');
 const suggestions = computed(() => similarNames(typedName.value));

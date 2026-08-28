@@ -289,3 +289,8 @@ export const actingAs = computed(
 
 export const groupName = 'Nonna Rosa — Saturday';
 export const payerName = 'Alice';
+
+/** Every Share on this Line Item is spoken for: total claimed has reached quantity. */
+export function isFull(lineItemId: string, quantity: number): boolean {
+    return totalShares(lineItemId) >= quantity;
+}
