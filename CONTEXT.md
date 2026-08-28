@@ -5,7 +5,7 @@ Tabby splits the cost of a shared event — a dinner, a trip — among the peopl
 ## Language
 
 **Group**:
-One shared event with a cost to divide — a trip, a dinner, a party. Event-scoped: it has a natural end, not a running relationship.
+One shared event with a cost to divide — a trip, a dinner, a party. Event-scoped: it has a natural end, not a running relationship. Denominated in exactly one currency, fixed once it holds an Expense.
 _Avoid_: Event, trip, tab, ledger
 
 **Organizer**:
@@ -33,11 +33,19 @@ An assertion by a Participant that they consumed some of a Line Item, expressed 
 _Avoid_: Assignment, allocation, split
 
 **Share**:
-The unit of a Claim. A Line Item's cost divides by the total Shares claimed against it, so the cost is always fully allocated among its claimers, regardless of quantity. Quantity is a completeness check, not a cap.
+The unit of a Claim. A Line Item's cost divides by the total Shares claimed against it, so the cost is always fully allocated among its claimers, regardless of quantity. Division is exact: the cost is split into whole units of the Group's currency and the leftover is handed out by a fixed remainder rule, never dropped or invented. Quantity is a completeness check, not a cap.
 _Avoid_: Portion, unit, weight, part
 
+**Allocation**:
+What one Participant owes for one Line Item or one Adjustment — always a whole number of units of the Group's currency, always derived. Exact: a Line Item's or Adjustment's Allocations sum to its cost, never a unit over or under.
+_Avoid_: Split, portion, amount, apportionment
+
+**Unclaimed**:
+The part of an Expense that no Claim reaches — a Line Item nobody took a Share of, or an Adjustment with nobody to divide among. Named rather than hidden, so that an Expense always accounts for itself: Allocations plus Unclaimed equal its total.
+_Avoid_: Leftover, remainder, unassigned, orphaned
+
 **Adjustment**:
-A charge on an Expense that is not a Line Item — tax, tip, service fee. Allocated either evenly across claimers or pro-rata to each claimer's claimed subtotal, chosen per Adjustment.
+A charge on an Expense that is not a Line Item — tax, tip, service fee. Allocated either pro-rata to each claimer's subtotal on that Expense, or evenly among every Participant who has claimed anything in the Group, chosen per Adjustment. May be negative, for a discount or voucher.
 _Avoid_: Fee, extra, surcharge, modifier
 
 **Balance**:
