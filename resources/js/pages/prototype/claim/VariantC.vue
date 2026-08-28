@@ -6,15 +6,25 @@
  * Built for the phone being passed around the table, not one phone per person.
  * Completeness warning: a fill bar on the tile itself.
  */
-import { Minus, UserPlus, X } from '@lucide/vue';
+import { Minus, TriangleAlert, UserPlus, X } from '@lucide/vue';
 import { computed, ref } from 'vue';
+import {
+    Dialog,
+    DialogContent,
+    DialogDescription,
+    DialogFooter,
+    DialogHeader,
+    DialogTitle,
+} from '@/components/ui/dialog';
 import {
     actingAs,
     addParticipant,
     adjustmentCentsFor,
     bumpShares,
+    claimersOf,
     formatMoney,
     groupName,
+    isFull,
     joinAs,
     lineItems,
     participants,
@@ -69,6 +79,10 @@ function overClaimed(item: LineItem): boolean {
     return totalShares(item.id) > item.quantity;
 }
 
+/** Line Items whose over-claim has already been confirmed once this session. */
+const waved = ref<string[]>([]);
+const pending = ref<LineItem | null>(null);
+
 function tap(item: LineItem): void {
     if (!session.actingAsId) {
         adding.value = true;
@@ -76,7 +90,25 @@ function tap(item: LineItem): void {
         return;
     }
 
+    if (isFull(item.id, item.quantity) && !waved.value.includes(item.id)) {
+        pending.value = item;
+
+        return;
+    }
+
     bumpShares(item.id, session.actingAsId, 1);
+}
+
+function confirmOverClaim(): void {
+    const item = pending.value;
+
+    if (!item || !session.actingAsId) {
+        return;
+    }
+
+    waved.value = [...waved.value, item.id];
+    bumpShares(item.id, session.actingAsId, 1);
+    pending.value = null;
 }
 </script>
 
@@ -321,5 +353,61 @@ function tap(item: LineItem): void {
                 </li>
             </ul>
         </div>
+
+        <Dialog
+            :open="pending !== null"
+            @update:open="(open: boolean) => !open && (pending = null)"
+        >
+            <DialogContent
+                class="max-w-sm rounded-2xl"
+                :show-close-button="false"
+            >
+                <DialogHeader>
+                    <span
+                        class="mb-1 grid size-10 place-items-center rounded-full bg-amber-100 text-amber-700"
+                    >
+                        <TriangleAlert class="size-5" />
+                    </span>
+                    <DialogTitle class="text-left">
+                        All {{ pending?.quantity }} already claimed
+                    </DialogTitle>
+                    <DialogDescription class="text-left">
+                        <template v-if="pending">
+                            {{
+                                claimersOf(pending.id)
+                                    .map((p) => p.name)
+                                    .join(', ')
+                            }}
+                            {{
+                                claimersOf(pending.id).length === 1
+                                    ? 'has'
+                                    : 'have'
+                            }}
+                            taken {{ totalShares(pending.id) }} of
+                            {{ pending.quantity }} &middot;
+                            {{ pending.description }}. Take a share anyway if
+                            you shared one &mdash; everyone on it splits the
+                            cost.
+                        </template>
+                    </DialogDescription>
+                </DialogHeader>
+                <DialogFooter class="flex-col gap-2 sm:flex-col">
+                    <button
+                        type="button"
+                        class="w-full rounded-xl bg-neutral-900 py-3.5 text-sm font-semibold text-white"
+                        @click="confirmOverClaim"
+                    >
+                        Yes, I shared it
+                    </button>
+                    <button
+                        type="button"
+                        class="w-full py-2 text-sm font-medium text-neutral-500"
+                        @click="pending = null"
+                    >
+                        Never mind
+                    </button>
+                </DialogFooter>
+            </DialogContent>
+        </Dialog>
     </div>
 </template>

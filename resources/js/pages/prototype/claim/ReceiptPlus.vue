@@ -31,10 +31,9 @@ import {
     subtotalCentsFor,
     totalCentsFor,
     totalShares,
-    unclaimedItems
-    
+    unclaimedItems,
 } from './state';
-import type {LineItem} from './state';
+import type { LineItem } from './state';
 
 const props = defineProps<{ mode: 'confirm' | 'hard' }>();
 
