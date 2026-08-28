@@ -8,7 +8,7 @@
  * the checkable part (what you claimed) before the part people distrust (why
  * this person).
  */
-import { ArrowRight, ChevronDown, ChevronUp, CircleCheck } from '@lucide/vue';
+import { ChevronDown, ChevronUp, CircleCheck } from '@lucide/vue';
 import { computed, ref } from 'vue';
 import {
     balanceOf,
@@ -21,12 +21,13 @@ import {
     participantOf,
     recordPayment,
     suggestedTransfers,
-    viewer
-    
+    viewer,
 } from './state';
-import type {SuggestedTransfer} from './state';
+import type { SuggestedTransfer } from './state';
+import TransferDiagram from './TransferDiagram.vue';
 
 const expanded = ref<string | null>(null);
+const selectedArrow = ref<string | null>(null);
 const paying = ref<string | null>(null);
 const payAmount = ref('');
 
@@ -38,6 +39,11 @@ const owedToMe = computed(() =>
     suggestedTransfers.value.filter((t) => t.toId === viewer.value.id),
 );
 const myLines = computed(() => owedLinesFor(viewer.value.id));
+const selectedTrace = computed(
+    () =>
+        suggestedTransfers.value.find((t) => t.id === selectedArrow.value) ??
+        null,
+);
 
 const paidAndBackInDebt = computed(
     () => myBalance.value.paymentsSentMinor > 0 && myBalance.value.netMinor < 0,
@@ -328,28 +334,84 @@ function confirmPayment(transfer: SuggestedTransfer): void {
                 @click="expanded = expanded === 'board' ? null : 'board'"
             >
                 <span class="font-medium">Everyone's balances</span>
-                <ArrowRight class="size-4 text-neutral-400" />
+                <ChevronUp
+                    v-if="expanded === 'board'"
+                    class="size-4 text-neutral-400"
+                />
+                <ChevronDown v-else class="size-4 text-neutral-400" />
             </button>
 
-            <ul
+            <div
                 v-if="expanded === 'board'"
-                class="mt-2 divide-y divide-neutral-100 rounded-2xl bg-white px-4 shadow-sm"
+                class="mt-2 rounded-2xl bg-white py-3 shadow-sm"
             >
-                <li
-                    v-for="transfer in suggestedTransfers"
-                    :key="transfer.id"
-                    class="flex items-center justify-between py-3 text-sm"
+                <p
+                    v-if="!suggestedTransfers.length"
+                    class="px-5 py-2 text-xs text-neutral-500"
                 >
-                    <span class="flex items-center gap-2">
-                        {{ nameOf(transfer.fromId) }}
-                        <ArrowRight class="size-3.5 text-neutral-400" />
-                        {{ nameOf(transfer.toId) }}
-                    </span>
-                    <span class="tabular-nums">
-                        {{ formatMoney(transfer.amountMinor) }}
-                    </span>
-                </li>
-            </ul>
+                    Every balance is zero — nothing is moving. A Claim landing
+                    later will put arrows back here.
+                </p>
+
+                <TransferDiagram
+                    v-else
+                    :selected-id="selectedArrow"
+                    theme="light"
+                    @select="selectedArrow = $event"
+                />
+
+                <div
+                    v-if="suggestedTransfers.length && selectedArrow === null"
+                    class="px-5 pt-1"
+                >
+                    <p class="text-xs text-neutral-500">
+                        {{ suggestedTransfers.length }} payments clear the whole
+                        group. Tap an arrow to see what one is made of.
+                    </p>
+                </div>
+
+                <div v-else-if="selectedTrace" class="px-5 pt-2">
+                    <p class="text-sm font-medium">
+                        {{ nameOf(selectedTrace.fromId) }} pays
+                        {{ nameOf(selectedTrace.toId) }}
+                        <span class="tabular-nums">
+                            {{ formatMoney(selectedTrace.amountMinor) }}
+                        </span>
+                    </p>
+                    <ul class="mt-2 space-y-1 text-xs text-neutral-600">
+                        <li
+                            v-for="source in selectedTrace.sources"
+                            :key="source.creditorId"
+                            class="flex justify-between gap-3"
+                        >
+                            <span>
+                                owed to {{ nameOf(source.creditorId) }}
+                                <span
+                                    v-if="!source.direct"
+                                    class="text-neutral-400"
+                                >
+                                    · routed
+                                </span>
+                            </span>
+                            <span class="tabular-nums">
+                                {{ formatMoney(source.amountMinor) }}
+                            </span>
+                        </li>
+                    </ul>
+                    <p
+                        v-if="
+                            !haveSharedAnExpense(
+                                selectedTrace.fromId,
+                                selectedTrace.toId,
+                            )
+                        "
+                        class="mt-2 rounded-lg bg-neutral-100 px-3 py-2 text-xs text-neutral-600"
+                    >
+                        These two never shared anything. The arrow saves the
+                        group payments; it isn't a debt between them.
+                    </p>
+                </div>
+            </div>
         </section>
     </div>
 </template>

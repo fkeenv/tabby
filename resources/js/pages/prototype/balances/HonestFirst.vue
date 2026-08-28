@@ -23,10 +23,9 @@ import {
     recordPayment,
     suggestedTransfers,
     unclaimedTotal,
-    viewer
-    
+    viewer,
 } from './state';
-import type {PairDebt} from './state';
+import type { PairDebt } from './state';
 
 const simplified = ref(false);
 const openPair = ref<string | null>(null);

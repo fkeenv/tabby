@@ -23,10 +23,9 @@ import {
     recordPayment,
     suggestedTransfers,
     unclaimedTotal,
-    viewer
-    
+    viewer,
 } from './state';
-import type {SuggestedTransfer} from './state';
+import type { SuggestedTransfer } from './state';
 
 const mode = ref<'suggested' | 'raw'>('suggested');
 const paying = ref<string | null>(null);

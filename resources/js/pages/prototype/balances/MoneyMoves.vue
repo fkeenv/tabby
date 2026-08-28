@@ -11,7 +11,6 @@
 import { CircleCheck } from '@lucide/vue';
 import { computed, ref } from 'vue';
 import {
-    balanceOf,
     formatMoney,
     groupName,
     haveSharedAnExpense,
@@ -22,63 +21,10 @@ import {
     recordPayment,
     suggestedTransfers,
     unclaimedTotal,
-    viewer,
 } from './state';
-
-const ROW = 84;
-const NODE_TOP = 8;
-const LEFT_EDGE = 132;
-const RIGHT_EDGE = 228;
+import TransferDiagram from './TransferDiagram.vue';
 
 const selectedId = ref<string | null>(null);
-
-const debtors = computed(() => {
-    const seen: string[] = [];
-
-    for (const transfer of suggestedTransfers.value) {
-        if (!seen.includes(transfer.fromId)) {
-            seen.push(transfer.fromId);
-        }
-    }
-
-    return seen;
-});
-
-const creditors = computed(() => {
-    const seen: string[] = [];
-
-    for (const transfer of suggestedTransfers.value) {
-        if (!seen.includes(transfer.toId)) {
-            seen.push(transfer.toId);
-        }
-    }
-
-    return seen;
-});
-
-const height = computed(
-    () =>
-        Math.max(debtors.value.length, creditors.value.length) * ROW + NODE_TOP,
-);
-
-const maxAmount = computed(() =>
-    Math.max(1, ...suggestedTransfers.value.map((t) => t.amountMinor)),
-);
-
-function centerY(column: string[], id: string): number {
-    return column.indexOf(id) * ROW + NODE_TOP + 32;
-}
-
-function pathFor(fromId: string, toId: string): string {
-    const y1 = centerY(debtors.value, fromId);
-    const y2 = centerY(creditors.value, toId);
-
-    return `M ${LEFT_EDGE},${y1} C 180,${y1} 180,${y2} ${RIGHT_EDGE},${y2}`;
-}
-
-function strokeFor(amountMinor: number): number {
-    return 2 + (12 * amountMinor) / maxAmount.value;
-}
 
 const selected = computed(
     () =>
@@ -126,125 +72,11 @@ function pay(): void {
         </section>
 
         <section v-else class="px-2">
-            <div
-                class="mb-1 flex justify-between px-4 text-[11px] text-neutral-500"
-            >
-                <span>pays</span>
-                <span>receives</span>
-            </div>
-
-            <svg
-                :viewBox="`0 0 360 ${height}`"
-                class="w-full"
-                :style="{ height: height + 'px' }"
-            >
-                <!-- arrows first, so nodes sit on top -->
-                <g
-                    v-for="transfer in suggestedTransfers"
-                    :key="transfer.id"
-                    class="cursor-pointer"
-                    @click="
-                        selectedId =
-                            selectedId === transfer.id ? null : transfer.id
-                    "
-                >
-                    <path
-                        :d="pathFor(transfer.fromId, transfer.toId)"
-                        fill="none"
-                        stroke="transparent"
-                        stroke-width="24"
-                    />
-                    <path
-                        :d="pathFor(transfer.fromId, transfer.toId)"
-                        fill="none"
-                        :stroke="
-                            selectedId === transfer.id
-                                ? 'rgb(255 255 255)'
-                                : transfer.fromId === viewer.id ||
-                                    transfer.toId === viewer.id
-                                  ? 'rgb(129 140 248)'
-                                  : 'rgb(64 64 64)'
-                        "
-                        :stroke-width="strokeFor(transfer.amountMinor)"
-                        stroke-linecap="round"
-                    />
-                    <text
-                        x="180"
-                        :y="
-                            (centerY(debtors, transfer.fromId) +
-                                centerY(creditors, transfer.toId)) /
-                                2 -
-                            8
-                        "
-                        text-anchor="middle"
-                        class="fill-neutral-300 text-[10px] tabular-nums"
-                    >
-                        {{ formatMoney(transfer.amountMinor) }}
-                    </text>
-                </g>
-
-                <!-- debtor nodes -->
-                <g v-for="(id, index) in debtors" :key="'d' + id">
-                    <rect
-                        x="8"
-                        :y="index * ROW + NODE_TOP"
-                        width="124"
-                        height="64"
-                        rx="14"
-                        :class="
-                            id === viewer.id
-                                ? 'fill-indigo-500/20 stroke-indigo-400'
-                                : 'fill-neutral-900 stroke-neutral-800'
-                        "
-                        stroke-width="1"
-                    />
-                    <text
-                        x="24"
-                        :y="index * ROW + NODE_TOP + 26"
-                        class="fill-neutral-100 text-[13px] font-medium"
-                    >
-                        {{ nameOf(id) }}{{ id === viewer.id ? ' (you)' : '' }}
-                    </text>
-                    <text
-                        x="24"
-                        :y="index * ROW + NODE_TOP + 46"
-                        class="fill-rose-300 text-[13px] tabular-nums"
-                    >
-                        {{ formatMoney(balanceOf(id).netMinor) }}
-                    </text>
-                </g>
-
-                <!-- creditor nodes -->
-                <g v-for="(id, index) in creditors" :key="'c' + id">
-                    <rect
-                        x="228"
-                        :y="index * ROW + NODE_TOP"
-                        width="124"
-                        height="64"
-                        rx="14"
-                        :class="
-                            id === viewer.id
-                                ? 'fill-indigo-500/20 stroke-indigo-400'
-                                : 'fill-neutral-900 stroke-neutral-800'
-                        "
-                        stroke-width="1"
-                    />
-                    <text
-                        x="244"
-                        :y="index * ROW + NODE_TOP + 26"
-                        class="fill-neutral-100 text-[13px] font-medium"
-                    >
-                        {{ nameOf(id) }}{{ id === viewer.id ? ' (you)' : '' }}
-                    </text>
-                    <text
-                        x="244"
-                        :y="index * ROW + NODE_TOP + 46"
-                        class="fill-emerald-300 text-[13px] tabular-nums"
-                    >
-                        +{{ formatMoney(balanceOf(id).netMinor) }}
-                    </text>
-                </g>
-            </svg>
+            <TransferDiagram
+                :selected-id="selectedId"
+                theme="dark"
+                @select="selectedId = $event"
+            />
 
             <p
                 v-if="unclaimedTotal > 0"
