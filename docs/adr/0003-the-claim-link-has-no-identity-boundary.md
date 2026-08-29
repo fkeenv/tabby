@@ -1,0 +1,21 @@
+# The Claim Link has no identity boundary
+
+Tabby's whole premise is that strangers split a bill themselves, from one link pasted into a group chat, without accounts — and the winning claim screen assumes one phone passed around a table, where switching who you are claiming for is a single tap. So we grant **holding the Claim Link** every anonymous power there is: view the Group, claim, record a Payment, and add a Participant, as **any** Participant, with nothing verified and nothing to confirm. The Participant a device is acting as — the **Acting Participant** — is a remembered convenience, never a credential. We chose this because the alternative is authentication theatre: a boundary that stops nobody who holds the link, while implying to everyone that the numbers behind it were checked.
+
+## Considered Options
+
+- **A per-Participant token appended to the URL after first pick.** The obvious way to make a device's identity stick, and the reason we rejected it is the reason this ADR exists: a link that carries identity gets forwarded, and the next person silently claims as its original owner. Every other failure mode in this space is visible and correctable; this one produces a wrong number nobody notices.
+- **A PIN or emailed magic link per Participant.** Real authentication, and fatal to the product. Participants hold no contact details by design — giving them any would make them PII-bearing — and a stranger standing in a restaurant will not complete a second factor to claim a plate of fries.
+- **Locking identity once chosen, with an explicit "switch person" mode.** Rejected on prototype evidence: the real case is one phone going round the table, so a mode turns the common action into the exceptional one. Under it the fluid rail — the thing that made the claim screen work — becomes a settings screen.
+- **A partial boundary: claim as anyone, but record Payments only as yourself.** Tempting, and worse than either extreme. The exception implies the unexcepted actions were verified, which is precisely the false belief this decision exists to prevent.
+- **The Organizer's own Participant as a protected exception.** Same objection. What is protected is the *ledger*, not any *identity* — the Organizer's authority comes from `auth`, not from their row in the roster.
+
+## Consequences
+
+- **The word "signed in" must never appear on a Claim Link screen.** The balance prototype rendered "Signed in as Chidi" and it is a lie; the header reads "Claiming as Chidi", and it is tappable. Copy is load-bearing here in a way it usually is not: it is the only thing conveying that nothing is verified.
+- **Visibility replaces verification.** Because anyone can act as anyone, the group's only protection is being able to see what happened — so a Payment stores `recorded_by_participant_id` beside its from and to, displayed but never consulted for permission.
+- **The two-tier route map follows directly.** Anonymous routes are token-addressed under `/g/{token}`; Organizer routes are id-addressed under `/groups/{group}` behind `auth`. The token never appears on an Organizer route and the id never on a Claim Link route, so the boundary that does exist is expressed as two disjoint route families rather than as a check inside a shared one.
+- **The Acting Participant never travels in the URL.** It lives in a `tabby_claim` cookie, separate from the Laravel session so that a 30-day claim memory does not silently become a 30-day Organizer login.
+- **The link is the entire attack surface**, so its hygiene is the whole defence: 128 bits of entropy, `noindex`/`no-referrer`, no mutating GET, rotation that revokes, and tokens scrubbed from access logs.
+- **Rotation is the only revocation.** There is no per-person eviction, because there is no per-person credential to evict — rotating strands every holder at once, which is why it is confirmed loudly.
+- **An accepted, permanent risk:** anyone with the link can quietly claim as someone else or mark a Payment that never happened. This is the honour system the product already runs on, made explicit rather than papered over. Reversing it later means introducing Participant credentials, which means contact details, which means Participants become PII-bearing — a change to what a Participant *is*, not a feature toggle.
