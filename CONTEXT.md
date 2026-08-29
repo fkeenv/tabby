@@ -63,3 +63,11 @@ _Avoid_: Settlement, debt, transfer
 **Payment**:
 A record that one Participant paid another some amount, entered by hand and unverified. Anyone with the Claim Link may record one. Reduces a Balance; does not close it.
 _Avoid_: Settlement, transaction, payout
+
+**Settled**:
+A Group whose every Balance is zero. Derived, never stored, and never final — a late Claim moves a Balance and the Group is no longer Settled. It describes the money at this moment; it is not a state a Group arrives at and stays in.
+_Avoid_: Closed, complete, finished, done, locked
+
+**Archived**:
+A Group the Organizer has put out of sight. Their housekeeping and nothing more: it drops the Group from the default dashboard view and changes nothing else — the Claim Link keeps working, Claims and Payments keep landing, Balances stay live. Independent of Settled: an unsettled Group may be Archived, and a Settled one need not be.
+_Avoid_: Closed, hidden, inactive, completed, finished
