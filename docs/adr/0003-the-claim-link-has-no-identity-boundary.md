@@ -1,6 +1,6 @@
 # The Claim Link has no identity boundary
 
-Tabby's whole premise is that strangers split a bill themselves, from one link pasted into a group chat, without accounts — and the winning claim screen assumes one phone passed around a table, where switching who you are claiming for is a single tap. So we grant **holding the Claim Link** every anonymous power there is: view the Group, claim, record a Payment, and add a Participant, as **any** Participant, with nothing verified and nothing to confirm. The Participant a device is acting as — the **Acting Participant** — is a remembered convenience, never a credential. We chose this because the alternative is authentication theatre: a boundary that stops nobody who holds the link, while implying to everyone that the numbers behind it were checked.
+Tabby's whole premise is that strangers split a bill themselves, from one link pasted into a group chat, without accounts — and the winning claim screen assumes one phone passed around a table, where switching who you are claiming for is a single tap. So we grant **holding the Claim Link** every anonymous power there is: view the Group, claim, record a Payment, add a Participant, and rename one, as **any** Participant, with nothing verified and nothing to confirm. The Participant a device is acting as — the **Acting Participant** — is a remembered convenience, never a credential. We chose this because the alternative is authentication theatre: a boundary that stops nobody who holds the link, while implying to everyone that the numbers behind it were checked.
 
 ## Considered Options
 
@@ -8,6 +8,7 @@ Tabby's whole premise is that strangers split a bill themselves, from one link p
 - **A PIN or emailed magic link per Participant.** Real authentication, and fatal to the product. Participants hold no contact details by design — giving them any would make them PII-bearing — and a stranger standing in a restaurant will not complete a second factor to claim a plate of fries.
 - **Locking identity once chosen, with an explicit "switch person" mode.** Rejected on prototype evidence: the real case is one phone going round the table, so a mode turns the common action into the exceptional one. Under it the fluid rail — the thing that made the claim screen work — becomes a settings screen.
 - **A partial boundary: claim as anyone, but record Payments only as yourself.** Tempting, and worse than either extreme. The exception implies the unexcepted actions were verified, which is precisely the false belief this decision exists to prevent.
+- **Reserving rename for the Organizer.** Held for one round and dropped in [Roster repair](https://github.com/fkeenv/tabby/issues/14): permitting a stranger to conjure a Participant under any name while forbidding them to correct an existing one is incoherent, since creating is the strictly more dangerous act. Merge and delete stay the Organizer's alone, because those move money.
 - **The Organizer's own Participant as a protected exception.** Same objection. What is protected is the *ledger*, not any *identity* — the Organizer's authority comes from `auth`, not from their row in the roster.
 
 ## Consequences

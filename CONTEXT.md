@@ -13,11 +13,11 @@ The authenticated user who owns a Group, records its Expenses, and repairs its r
 _Avoid_: Owner, admin, host
 
 **Participant**:
-A named person who owes or is owed money within one Group. Belongs to exactly one Group, holds no account and no contact details, and comes into existence when someone types a name on the Claim Link — their own, or an absent person's. The Organizer is auto-created as one. Because names are typed by strangers on a phone, duplicates are expected and the Organizer repairs the roster by renaming, merging, or deleting.
+A named person who owes or is owed money within one Group. Belongs to exactly one Group, holds no account and no contact details, and comes into existence when someone types a name on the Claim Link — their own, or an absent person's. The Organizer is auto-created as one. Because names are typed by strangers on a phone, duplicates are expected: anyone holding the Claim Link may fix a name, while merging and deleting belong to the Organizer, who is the only person allowed to move money around. Merging never destroys a row — the absorbed Participant stays as a tombstone every read resolves through — so it can be undone.
 _Avoid_: Member, user, person, friend
 
 **Claim Link**:
-The single unguessable URL that grants anonymous access to a Group. Its holder may view everything, claim, record a Payment, and add a Participant — and may act as any Participant while doing so — but may never create, edit, or delete an Expense. Holding it is the only credential; it carries no notion of who is holding it. Rotatable by the Organizer, which strands every other holder.
+The single unguessable URL that grants anonymous access to a Group. Its holder may view everything, claim, record a Payment, add a Participant, and rename one — and may act as any Participant while doing so — but may never create, edit, or delete an Expense, and may never merge or delete a Participant. Holding it is the only credential; it carries no notion of who is holding it. Rotatable by the Organizer, which strands every other holder.
 _Avoid_: Share link, invite, magic link
 
 **Acting Participant**:
