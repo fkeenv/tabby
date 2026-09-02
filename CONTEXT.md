@@ -45,7 +45,7 @@ What one Participant owes for one Line Item or one Adjustment — always a whole
 _Avoid_: Split, portion, amount, apportionment
 
 **Unclaimed**:
-The part of an Expense that no Claim reaches — a Line Item nobody took a Share of, or an Adjustment with nobody to divide among. Named rather than hidden, so that an Expense always accounts for itself: Allocations plus Unclaimed equal its total.
+The part of an Expense that no Claim reaches — a Line Item nobody took a Share of, or an Adjustment's share of one. Named rather than hidden, so that an Expense always accounts for itself: Allocations plus Unclaimed equal its total. Carried by that Expense's payer, who is out of pocket for it either way — but carried openly, never silently: the payer is told, and the Group is shown that the bill is incomplete for as long as it is. Anyone can end it by claiming the thing, which is what it is asking for.
 _Avoid_: Leftover, remainder, unassigned, orphaned
 
 **Adjustment**:
@@ -53,7 +53,7 @@ A charge on an Expense that is not a Line Item — tax, tip, service fee. Alloca
 _Avoid_: Fee, extra, surcharge, modifier
 
 **Balance**:
-What a Participant net owes or is owed, derived from their Claims and Payments. Always computed, never stored, and never frozen — a late Claim moves it.
+What a Participant net owes or is owed, derived from their Claims, their Payments, and — for a Participant who has paid for an Expense — what they fronted and what of it went Unclaimed. Always computed, never stored, and never frozen: a late Claim moves it, and so does someone finally claiming the fries.
 _Avoid_: Total, debt, amount owed
 
 **Suggested Transfer**:
