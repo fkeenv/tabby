@@ -25,7 +25,7 @@ The Participant a device is currently claiming and paying as. A remembered defau
 _Avoid_: Current user, session, logged-in participant, me
 
 **Expense**:
-One purchase within a Group, recorded by the Organizer, with exactly one Participant as its payer. Composed of Line Items and optional Adjustments.
+One purchase within a Group, recorded by the Organizer, with exactly one Participant as its payer. Composed of Line Items and optional Adjustments. Correctable and removable by the Organizer at any time, including after people have claimed against it: Balances re-derive underneath, and the change is recorded as Activity rather than versioned.
 _Avoid_: Bill, receipt, transaction, purchase
 
 **Line Item**:
@@ -33,7 +33,7 @@ One purchasable thing on an Expense — description, quantity, unit price. The u
 _Avoid_: Item, entry, row
 
 **Claim**:
-An assertion by a Participant that they consumed some of a Line Item, expressed as a number of Shares. Claims *are* the split method; they are what turns an Expense into Balances.
+An assertion by a Participant that they consumed some of a Line Item, expressed as a number of Shares. Claims *are* the split method; they are what turns an Expense into Balances. Survives correction of the Line Item beneath it — a changed price or quantity alters what the Claim costs, never whether it was made — and survives that Line Item's removal, counting for nothing while it is gone.
 _Avoid_: Assignment, allocation, split
 
 **Share**:
@@ -63,6 +63,10 @@ _Avoid_: Settlement, debt, transfer
 **Payment**:
 A record that one Participant paid another some amount, entered by hand and unverified. Anyone with the Claim Link may record one. Reduces a Balance; does not close it.
 _Avoid_: Settlement, transaction, payout
+
+**Activity**:
+One recorded change to a Group — who made it and what it was, in a sentence a stranger can read. Append-only and never edited, visible to everyone holding the Claim Link because that visibility is the only protection a Group has where nothing is verified. Outlives whatever it describes, so a deleted Expense keeps its deletion on the record, and is purged only when the Group is. A history of changes, not a version of the thing changed: it says the price moved, never what the bill looked like on Tuesday.
+_Avoid_: Event (a Group *is* the shared event), log, audit trail, history, feed
 
 **Settled**:
 A Group whose every Balance is zero. Derived, never stored, and never final — a late Claim moves a Balance and the Group is no longer Settled. It describes the money at this moment; it is not a state a Group arrives at and stays in.
